@@ -1,0 +1,5 @@
+# One line ending everywhere. Without this, a Windows checkout rewrites every
+# file and the first diff anybody sees is the whole repository.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
