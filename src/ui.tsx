@@ -32,9 +32,19 @@ const TONE: Record<Tone, string> = {
   // One solid button per screen, and it is the one that commits. When every
   // control is glass the eye has to read all of them to find the action, which
   // is the wrong moment to think - it is usually approving somebody's money.
-  go: 'bg-go text-white border-go/60 hover:bg-[#0C9159] hover:shadow-glow',
-  quiet: 'bg-white/70 text-ink border-rim hover:bg-white hover:border-white/80 hover:shadow-lift',
-  danger: 'bg-stop/12 text-stop border-stop/30 hover:bg-stop/20 hover:border-stop/50 hover:shadow-lift',
+  //
+  // The primary is a gradient with a lit top edge rather than a flat slab,
+  // because a flat slab sits dead next to a sheet of glass.
+  go:
+    'border-[#0C9159]/60 bg-gradient-to-b from-[#19C07C] to-[#0C9159] text-white ' +
+    'shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_6px_16px_-6px_rgba(12,145,89,0.55)] ' +
+    'hover:from-[#1FCE87] hover:to-[#0E9E62] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_10px_22px_-8px_rgba(12,145,89,0.6)]',
+  quiet:
+    'border-rim bg-white/80 text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] ' +
+    'hover:border-rim-strong hover:bg-white hover:shadow-lift',
+  danger:
+    'border-stop/30 bg-stop/[0.08] text-stop shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] ' +
+    'hover:border-stop/50 hover:bg-stop/[0.14] hover:shadow-lift',
 };
 
 export function Button({
@@ -159,17 +169,23 @@ export function Code({ children }: { children: ReactNode }) {
 /* -------------------------------------------------------------------------- */
 
 /**
- * One table, two shapes.
+ * One table, two shapes, and rows that open.
  *
  * On a wide screen this is an ordinary table: rows separated by a hairline,
  * nothing framed, because fifty framed rows in a column is a quilt rather than
  * something you can scan down.
  *
  * On a phone a seven-column table is unreadable at any zoom, so each row
- * becomes its own small card with the column headings printed beside the
- * values. The views do not know this happens - `Row` reads the headings from
- * context and hands each `Cell` its own label - so a screen written once works
- * in both shapes and cannot drift out of step with itself.
+ * becomes its own card with the column headings printed beside the values. The
+ * views do not know this happens - `Row` reads the headings from context and
+ * hands each `Cell` its own label - so a screen written once works in both
+ * shapes and cannot drift out of step with itself.
+ *
+ * A row given a `detail` opens. That is what keeps the table narrow: the
+ * columns carry only what somebody scans down a list for, and everything else -
+ * the timestamps, the note, the receipt, the whole row as stored - waits one
+ * click away instead of being cut from the product or crushed into a column
+ * nobody can read.
  */
 const HeadContext = createContext<ReactNode[]>([]);
 
@@ -183,7 +199,7 @@ export function Table({ head, children }: { head: ReactNode[]; children: ReactNo
               {head.map((cell, i) => (
                 <th
                   key={i}
-                  className="whitespace-nowrap border-b border-rim-soft px-3 py-3 text-left text-[10.5px] font-bold uppercase tracking-wider text-ink-faint"
+                  className="whitespace-nowrap border-b border-rim px-3 py-3 text-left text-[10.5px] font-bold uppercase tracking-wider text-ink-faint"
                 >
                   {cell}
                 </th>
@@ -197,23 +213,96 @@ export function Table({ head, children }: { head: ReactNode[]; children: ReactNo
   );
 }
 
-export function Row({ children }: { children: ReactNode }) {
+export function Row({ children, detail }: { children: ReactNode; detail?: ReactNode }) {
   const head = useContext(HeadContext);
+  const [open, setOpen] = useState(false);
+  const opens = detail !== undefined;
+
+  const cells = Children.map(children, (child, i) =>
+    isValidElement(child)
+      ? cloneElement(child as ReactElement<{ label?: ReactNode }>, { label: head[i] })
+      : child,
+  );
 
   return (
-    <tr
-      className={
-        'transition-colors hover:bg-go/[0.05] ' +
-        'max-lg:block max-lg:rounded-card max-lg:border max-lg:border-rim-soft ' +
-        'max-lg:bg-white/70 max-lg:p-3.5'
-      }
-    >
-      {Children.map(children, (child, i) =>
-        isValidElement(child)
-          ? cloneElement(child as ReactElement<{ label?: ReactNode }>, { label: head[i] })
-          : child,
+    <>
+      <tr
+        onClick={opens ? () => setOpen((was) => !was) : undefined}
+        className={[
+          'transition-colors',
+          opens ? 'cursor-pointer hover:bg-go/[0.06]' : 'hover:bg-go/[0.04]',
+          // As a card on a phone.
+          'max-lg:block max-lg:border max-lg:border-rim-soft max-lg:bg-sheet-solid max-lg:p-3.5',
+          open ? 'max-lg:rounded-t-card bg-go/[0.05]' : 'max-lg:rounded-card',
+        ].join(' ')}
+      >
+        {cells}
+
+        {opens && (
+          <td className="w-10 border-b border-rim-soft px-2 py-3 align-middle max-lg:hidden">
+            <Chevron open={open} />
+          </td>
+        )}
+
+        {/* The phone card says so in words: a chevron alone in the corner of a
+            card is not an obvious offer, and the row is already tappable. */}
+        {opens && (
+          <td className="hidden max-lg:mt-2 max-lg:flex max-lg:items-center max-lg:justify-center max-lg:gap-1.5 max-lg:border-t max-lg:border-rim-soft max-lg:pt-2.5 max-lg:text-[12px] max-lg:font-semibold max-lg:text-ink-muted">
+            {open ? 'Yopish' : 'Batafsil'}
+            <Chevron open={open} />
+          </td>
+        )}
+      </tr>
+
+      {opens && (
+        <tr
+          className={[
+            'max-lg:block',
+            open ? 'max-lg:-mt-2.5 max-lg:rounded-b-card max-lg:border max-lg:border-t-0 max-lg:border-rim-soft max-lg:bg-sheet-solid' : '',
+          ].join(' ')}
+        >
+          <td colSpan={head.length + 1} className="border-0 p-0 max-lg:block">
+            {/*
+              Opened with a grid track rather than a max-height.
+              `grid-template-rows: 0fr -> 1fr` animates to the content's real
+              height, so it works for a two-line note and for a screenful of
+              JSON without anybody having to guess a number that is wrong for
+              one of them.
+            */}
+            <div
+              className={
+                'grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ' +
+                (open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')
+              }
+            >
+              <div className="overflow-hidden">
+                <div className="border-b border-rim-soft bg-go/[0.04] px-3 py-4 max-lg:border-0 max-lg:bg-transparent max-lg:px-3.5">
+                  {detail}
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
       )}
-    </tr>
+    </>
+  );
+}
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      className={
+        'h-4 w-4 shrink-0 text-ink-faint transition-transform duration-300 ' +
+        (open ? 'rotate-180' : '')
+      }
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden
+    >
+      <path d="m4 6 4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 
@@ -234,7 +323,6 @@ export function Cell({
       className={[
         'border-b border-rim-soft px-3 py-3 align-top',
         numeric ? 'whitespace-nowrap lg:text-right lg:font-mono' : '',
-        // As a card row: a label/value pair, no borders, no cell padding.
         'max-lg:flex max-lg:items-baseline max-lg:justify-between max-lg:gap-4',
         'max-lg:border-0 max-lg:px-0 max-lg:py-1 max-lg:text-right',
         'max-lg:empty:hidden',
@@ -251,6 +339,23 @@ export function Cell({
       )}
       <span className={numeric ? 'max-lg:font-mono' : undefined}>{children}</span>
     </td>
+  );
+}
+
+/**
+ * A label and its value inside an opened row.
+ *
+ * Two columns on anything but the narrowest screen, so a stack of them lines up
+ * into something readable rather than a ragged list of sentences.
+ */
+export function Detail({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-0.5 py-1.5 sm:flex-row sm:gap-4">
+      <span className="text-[11px] font-bold uppercase tracking-wider text-ink-faint sm:w-44 sm:shrink-0 sm:pt-0.5">
+        {label}
+      </span>
+      <span className="min-w-0 break-words text-[13px]">{children}</span>
+    </div>
   );
 }
 

@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../api';
 import { Screen } from '../App';
 import type { AuditEntry, Pagination } from '../types';
-import { Button, Cell, Code, Dialog, Empty, Loading, Row, Table, when } from '../ui';
+import { Button, Cell, Code, Detail, Empty, Loading, Row, Table, when } from '../ui';
 
 function pretty(json: string | null): string {
   if (!json) return '—';
@@ -28,7 +28,6 @@ export function Audit() {
   const [page, setPage] = useState(1);
   const [rows, setRows] = useState<AuditEntry[] | null>(null);
   const [meta, setMeta] = useState<Pagination | null>(null);
-  const [showing, setShowing] = useState<AuditEntry | null>(null);
 
   useEffect(() => {
     setRows(null);
@@ -49,9 +48,33 @@ export function Audit() {
         <Empty>Hozircha yozuv yoʻq</Empty>
       ) : (
         <>
-          <Table head={['Qachon', 'Kim', 'Amal', 'Nima', '']}>
+          <Table head={['Qachon', 'Kim', 'Amal', 'Nima']}>
             {rows.map((entry) => (
-              <Row key={entry.id}>
+              <Row
+                key={entry.id}
+                detail={
+                  <>
+                    <Detail label="Kim">
+                      {entry.admin_name ?? '—'}
+                      {entry.admin_email ? ' · ' + entry.admin_email : ''}
+                      {entry.user_id ? ' · #' + entry.user_id : ''}
+                    </Detail>
+                    <Detail label="IP manzil">
+                      <span className="font-mono">{entry.ip ?? '—'}</span>
+                    </Detail>
+                    <Detail label="Oldin">
+                      <pre className="max-h-56 overflow-auto whitespace-pre-wrap break-all rounded-card border border-rim-soft bg-white p-3 font-mono text-[11.5px]">
+                        {pretty(entry.before_json)}
+                      </pre>
+                    </Detail>
+                    <Detail label="Keyin">
+                      <pre className="max-h-56 overflow-auto whitespace-pre-wrap break-all rounded-card border border-rim-soft bg-white p-3 font-mono text-[11.5px]">
+                        {pretty(entry.after_json)}
+                      </pre>
+                    </Detail>
+                  </>
+                }
+              >
                 <Cell className="text-ink-faint">{when(entry.created_at)}</Cell>
                 <Cell>{entry.admin_name ?? entry.admin_email ?? '—'}</Cell>
                 <Cell>
@@ -62,15 +85,6 @@ export function Audit() {
                     {entry.entity}
                     {entry.entity_id ? `#${entry.entity_id}` : ''}
                   </span>
-                </Cell>
-                <Cell>
-                  {entry.after_json || entry.before_json ? (
-                    <button onClick={() => setShowing(entry)} className="text-link hover:underline">
-                      Koʻrish
-                    </button>
-                  ) : (
-                    <span className="text-ink-faint">—</span>
-                  )}
                 </Cell>
               </Row>
             ))}
@@ -92,18 +106,6 @@ export function Audit() {
         </>
       )}
 
-      {showing && (
-        <Dialog title={`Audit #${showing.id}`} onClose={() => setShowing(null)}>
-          <p className="mb-1.5 text-[12.5px] text-ink-muted">Oldin</p>
-          <pre className="card mb-4 max-h-52 overflow-auto whitespace-pre-wrap break-all p-3 font-mono text-[11.5px]">
-            {pretty(showing.before_json)}
-          </pre>
-          <p className="mb-1.5 text-[12.5px] text-ink-muted">Keyin</p>
-          <pre className="card max-h-52 overflow-auto whitespace-pre-wrap break-all p-3 font-mono text-[11.5px]">
-            {pretty(showing.after_json)}
-          </pre>
-        </Dialog>
-      )}
     </Screen>
   );
 }

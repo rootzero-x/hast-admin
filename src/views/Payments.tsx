@@ -12,7 +12,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ApiError, api, fetchBlobUrl } from '../api';
 import { Screen } from '../App';
 import type { Payment } from '../types';
-import { Button, Cell, Dialog, Empty, Loading, Row, Table, Tag, money, useToast, when } from '../ui';
+import { Button, Cell, Detail, Dialog, Empty, Loading, Row, Table, Tag, money, useToast, when } from '../ui';
 
 const FILTERS: { value: string; label: string }[] = [
   { value: 'submitted', label: 'Tekshiruvda' },
@@ -87,7 +87,41 @@ export function Payments({ can }: { can: (permission: string) => boolean }) {
       ) : (
         <Table head={['Havola', 'Kim', 'Nima uchun', 'Summa', 'Yuborildi', 'Holat', '']}>
           {rows.map((payment) => (
-            <Row key={payment.id}>
+            <Row
+              key={payment.id}
+              detail={
+                <>
+                  <Detail label="Foydalanuvchi">
+                    {payment.user.name ?? '—'}
+                    {payment.user.phone ? ' · ' + payment.user.phone : ''}
+                    {payment.user.email ? ' · ' + payment.user.email : ''}
+                    <span className="ml-2 text-ink-faint">#{payment.user.id}</span>
+                  </Detail>
+                  <Detail label="Havola">
+                    <span className="font-mono">{payment.reference}</span>
+                  </Detail>
+                  <Detail label="Yaratildi">{when(payment.created_at)}</Detail>
+                  <Detail label="Chek yuborildi">{when(payment.submitted_at)}</Detail>
+                  <Detail label="Koʻrib chiqildi">{when(payment.reviewed_at)}</Detail>
+                  {payment.review_note && (
+                    <Detail label="Izoh">{payment.review_note}</Detail>
+                  )}
+                  <Detail label="Chek">
+                    {payment.receipt_url ? (
+                      <button
+                        type="button"
+                        onClick={() => void openReceipt(payment)}
+                        className="font-semibold text-link hover:underline"
+                      >
+                        Chekni ochish
+                      </button>
+                    ) : (
+                      <span className="text-ink-faint">Yuborilmagan</span>
+                    )}
+                  </Detail>
+                </>
+              }
+            >
               <Cell>
                 <span className="font-mono text-xs">{payment.reference}</span>
               </Cell>
