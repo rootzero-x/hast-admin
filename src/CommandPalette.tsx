@@ -120,13 +120,13 @@ export function CommandPalette({ commands }: { commands: Command[] }) {
       role="presentation"
     >
       <div
-        className="animate-pop h-fit w-full max-w-[540px] overflow-hidden rounded-soft border border-edge-bright bg-panel shadow-sheet"
+        className="animate-pop h-fit w-full max-w-[540px] overflow-hidden rounded-card border border-rim-bright bg-plate-float shadow-float"
         onMouseDown={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-label="Buyruqlar"
       >
-        <div className="flex items-center gap-2.5 border-b border-edge px-4">
+        <div className="flex items-center gap-2.5 border-b border-rim px-4">
           <SearchIcon />
           <input
             ref={inputRef}
@@ -153,8 +153,8 @@ export function CommandPalette({ commands }: { commands: Command[] }) {
                 onMouseEnter={() => setCursor(i)}
                 onClick={() => choose(command)}
                 className={
-                  'flex w-full items-center justify-between gap-4 rounded-soft-sm px-3 py-2.5 text-left text-[13.5px] transition-colors ' +
-                  (i === cursor ? 'bg-panel-lift text-ink' : 'text-ink-muted')
+                  'flex w-full items-center justify-between gap-4 rounded-pill px-3 py-2.5 text-left text-[13.5px] transition-colors ' +
+                  (i === cursor ? 'bg-white/[0.07] text-ink' : 'text-ink-muted')
                 }
               >
                 <span className="truncate">{command.label}</span>
@@ -164,7 +164,7 @@ export function CommandPalette({ commands }: { commands: Command[] }) {
           )}
         </div>
 
-        <div className="flex items-center gap-4 border-t border-edge px-4 py-2.5 text-[11.5px] text-ink-faint">
+        <div className="flex items-center gap-4 border-t border-rim px-4 py-2.5 text-[11.5px] text-ink-faint">
           <Hint keys={['↑', '↓']}>tanlash</Hint>
           <Hint keys={['↵']}>ochish</Hint>
           <Hint keys={['Esc']}>yopish</Hint>

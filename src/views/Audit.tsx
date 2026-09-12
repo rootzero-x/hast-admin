@@ -95,11 +95,11 @@ export function Audit() {
       {showing && (
         <Dialog title={`Audit #${showing.id}`} onClose={() => setShowing(null)}>
           <p className="mb-1.5 text-[12.5px] text-ink-muted">Oldin</p>
-          <pre className="well mb-4 max-h-52 overflow-auto whitespace-pre-wrap break-all p-3 font-mono text-[11.5px]">
+          <pre className="card mb-4 max-h-52 overflow-auto whitespace-pre-wrap break-all p-3 font-mono text-[11.5px]">
             {pretty(showing.before_json)}
           </pre>
           <p className="mb-1.5 text-[12.5px] text-ink-muted">Keyin</p>
-          <pre className="well max-h-52 overflow-auto whitespace-pre-wrap break-all p-3 font-mono text-[11.5px]">
+          <pre className="card max-h-52 overflow-auto whitespace-pre-wrap break-all p-3 font-mono text-[11.5px]">
             {pretty(showing.after_json)}
           </pre>
         </Dialog>

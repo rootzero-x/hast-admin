@@ -38,7 +38,7 @@ declare global {
 
 function Mark() {
   return (
-    <svg viewBox="0 0 100 100" className="mx-auto mb-5 h-16 w-16 rounded-soft border border-edge bg-panel-lift p-2">
+    <svg viewBox="0 0 100 100" className="mx-auto mb-5 h-16 w-16 rounded-card border border-rim bg-white/[0.07] p-2">
       <rect width="100" height="100" rx="24" fill="#12A25F" />
       <path
         d="M22 48 L50 26 L78 48"
@@ -213,13 +213,13 @@ function FirstStep({
       <p className="mb-6 text-[13px] text-ink-muted">Kirish uchun ikkita tasdiq kerak.</p>
 
       {/* Google draws its own button and will not be restyled, so it is given a
-          pressed well to sit in rather than looking pasted on. */}
-      <div ref={googleSlot} className="flex min-h-[44px] justify-center rounded-soft-sm border border-edge bg-panel-lift p-1.5" />
+          pressed card to sit in rather than looking pasted on. */}
+      <div ref={googleSlot} className="flex min-h-[44px] justify-center rounded-pill border border-rim bg-white/[0.07] p-1.5" />
 
       <div className="relative my-5 text-[11.5px] uppercase tracking-wider text-ink-faint">
-        <span className="absolute left-0 top-1/2 h-px w-[calc(50%-28px)] bg-hair" />
+        <span className="absolute left-0 top-1/2 h-px w-[calc(50%-28px)] bg-rim-soft" />
         yoki
-        <span className="absolute right-0 top-1/2 h-px w-[calc(50%-28px)] bg-hair" />
+        <span className="absolute right-0 top-1/2 h-px w-[calc(50%-28px)] bg-rim-soft" />
       </div>
 
       <Button tone="quiet" busy={telegramBusy} onClick={() => void startTelegram()}>
@@ -227,7 +227,7 @@ function FirstStep({
       </Button>
 
       {telegramNote && <p className="mt-4 text-[12.5px] text-ink-muted">{telegramNote}</p>}
-      {error && <p className="well mt-4 p-3 text-[12.5px] text-stop">{error}</p>}
+      {error && <p className="card mt-4 p-3 text-[12.5px] text-stop">{error}</p>}
     </Gate>
   );
 }
@@ -297,7 +297,7 @@ function SecondStep({
           <p className="mb-3 text-[13px] text-ink-muted">
             Google Authenticator → <b>+</b> → <b>Enter a setup key</b>
           </p>
-          <div className="well my-4 break-all p-4 font-mono text-[15px] leading-loose tracking-[2.5px] text-go">
+          <div className="card my-4 break-all p-4 font-mono text-[15px] leading-loose tracking-[2.5px] text-go">
             {factor.secret_formatted ?? factor.secret}
           </div>
           <Button
@@ -326,14 +326,14 @@ function SecondStep({
           setCode(digits);
           if (digits.length === 6) void submit(digits);
         }}
-        className="my-5 w-full rounded-soft-sm border border-edge bg-panel-lift p-4 text-center font-mono text-[27px] font-bold tracking-[11px] text-ink outline-none focus:ring-2 focus:ring-go/35"
+        className="my-5 w-full rounded-pill border border-rim bg-white/[0.07] p-4 text-center font-mono text-[27px] font-bold tracking-[11px] text-ink outline-none focus:ring-2 focus:ring-go/35"
       />
 
       <Button busy={busy} onClick={() => void submit(code)}>
         Kirish
       </Button>
 
-      {error && <p className="well mt-4 p-3 text-[12.5px] text-stop">{error}</p>}
+      {error && <p className="card mt-4 p-3 text-[12.5px] text-stop">{error}</p>}
 
       <button onClick={onBack} className="mt-4 text-[13px] text-link hover:underline">
         Orqaga
@@ -345,7 +345,7 @@ function SecondStep({
 function Gate({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid min-h-dvh place-items-center p-6">
-      <div className="surface w-full max-w-[400px] px-8 py-9 text-center">{children}</div>
+      <div className="plate w-full max-w-[400px] px-8 py-9 text-center">{children}</div>
     </div>
   );
 }

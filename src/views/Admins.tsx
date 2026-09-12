@@ -185,7 +185,7 @@ function Permissions({
       </div>
 
       {catalogue.groups.map((group) => (
-        <div key={group.group} className="surface-sm p-4">
+        <div key={group.group} className="card p-4">
           <h4 className="mb-2.5 text-[10.5px] font-bold uppercase tracking-widest text-ink-faint">
             {group.group}
           </h4>

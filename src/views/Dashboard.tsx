@@ -120,7 +120,7 @@ function Signups({ rows }: { rows: { day: string; n: number }[] }) {
   const labelled = (i: number): boolean => (points.length - 1 - i) % labelEvery === 0;
 
   return (
-    <section className="surface p-5">
+    <section className="plate p-5">
       <header className="mb-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
         <h3 className="text-[15px] font-bold">Soʻnggi 14 kun</h3>
         <p className="text-[12.5px] text-ink-muted">

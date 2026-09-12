@@ -9,7 +9,7 @@
  * the interface cannot keep.
  *
  * **Every write is recorded** with the row before and after. That is said out
- * loud on the screen as well, because an administrator who knows their edits
+ * loud on the screen as card, because an administrator who knows their edits
  * are attributable makes different, better decisions.
  */
 

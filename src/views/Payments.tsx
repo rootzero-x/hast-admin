@@ -137,7 +137,7 @@ export function Payments({ can }: { can: (permission: string) => boolean }) {
             setReceipt(null);
           }}
         >
-          <img src={receipt.url} alt="Chek" className="w-full rounded-soft-sm border border-edge" />
+          <img src={receipt.url} alt="Chek" className="w-full rounded-pill border border-rim" />
         </Dialog>
       )}
 

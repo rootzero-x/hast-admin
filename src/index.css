@@ -3,12 +3,9 @@
 @tailwind utilities;
 
 /*
- * Only what Tailwind cannot express in a class.
- *
- * Everything else belongs in the markup, next to the thing it styles - the
- * whole point of choosing Tailwind. What lands here is the handful of rules
- * with no element to hang off: the document itself, the scrollbars, and the
- * browser chrome for dialogs and autofill.
+ * Only what Tailwind cannot express in a class: the environment behind the
+ * panes, the glass recipes themselves, and the browser chrome for scrollbars,
+ * dialogs and autofill.
  */
 
 @layer base {
@@ -18,19 +15,32 @@
     height: 100%;
   }
 
+  /*
+   * The environment.
+   *
+   * Glass needs something to refract, so the page is not a flat colour: three
+   * wide pools of light sit behind everything, fixed to the viewport so the
+   * panes appear to move across a lit room rather than dragging their own
+   * background with them.
+   */
   body {
-    @apply bg-panel-deep font-sans text-ink antialiased;
+    @apply bg-env font-sans text-ink antialiased;
+
+    background-image:
+      radial-gradient(1200px 780px at 6% -12%, rgba(61, 214, 140, 0.30), transparent 60%),
+      radial-gradient(1000px 720px at 98% 2%, rgba(86, 148, 255, 0.26), transparent 62%),
+      radial-gradient(900px 700px at 78% 96%, rgba(150, 96, 255, 0.16), transparent 60%),
+      radial-gradient(1100px 860px at 34% 112%, rgba(61, 214, 140, 0.18), transparent 60%);
+    background-attachment: fixed;
   }
 
   ::selection {
-    background: rgba(53, 194, 122, 0.3);
+    background: rgba(61, 214, 140, 0.32);
   }
 
-  /* Thin and dark, so it belongs to the panel rather than the operating
-     system. A default scrollbar is the loudest thing on a dark screen. */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #2e323b transparent;
+    scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
   }
 
   *::-webkit-scrollbar {
@@ -43,59 +53,82 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background: #2e323b;
+    background: rgba(255, 255, 255, 0.16);
     border-radius: 99px;
-    border: 3px solid #101114;
+    border: 3px solid transparent;
+    background-clip: content-box;
   }
 
-  /* Chrome paints autofilled inputs bright blue, which looks like a bug in a
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.26);
+    background-clip: content-box;
+  }
+
+  /* Chrome paints autofilled inputs bright blue, which looks like a fault in a
      dark interface. The inset shadow trick is the only way to override it. */
   input:-webkit-autofill,
   input:-webkit-autofill:focus {
-    -webkit-text-fill-color: #e6e8eb;
-    -webkit-box-shadow: 0 0 0 1000px #1c1f26 inset;
+    -webkit-text-fill-color: #f2f5f8;
+    -webkit-box-shadow: 0 0 0 1000px rgba(38, 45, 58, 0.98) inset;
     transition: background-color 9999s ease-out;
   }
 
   dialog::backdrop {
-    background: rgba(6, 8, 11, 0.72);
-    backdrop-filter: blur(2px);
+    background: rgba(6, 9, 13, 0.6);
+    backdrop-filter: blur(8px);
+  }
+
+  /* Depth is the whole language here, so somebody who has asked for less
+     movement still gets the hierarchy - they simply stop being flown at. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
 @layer components {
   /*
-   * The three surfaces the whole panel is built from.
+   * The three depths everything is built from.
    *
-   * They are components rather than repeated utility strings because the pair
-   * of (background step, border) *is* the design: if two of them drift apart,
-   * the flat hierarchy stops reading and the fix is to hunt through the markup
-   * for which one is wrong.
+   * `pane`   - the chrome: sidebar, top bar. Full glass, because it sits over
+   *            the environment and is meant to feel like a window frame.
+   * `plate`  - the work surface: holds tables and forms. Barely translucent
+   *            and only lightly blurred, because legibility outranks effect
+   *            wherever the two disagree.
+   * `float`  - dialogs and the command palette, at the top of the stack.
    */
-  .surface {
-    @apply rounded-soft border border-edge bg-panel;
+  .pane {
+    @apply rounded-pane border border-rim bg-plate shadow-plate backdrop-blur-pane;
   }
 
-  .surface-sm {
-    @apply rounded-soft-sm border border-edge bg-panel;
+  .plate {
+    @apply rounded-pane border border-rim-soft bg-plate-raised shadow-plate backdrop-blur-card;
   }
 
-  /* A recess: one step darker than the panel it sits in. */
-  .well {
-    @apply rounded-soft-sm border border-edge-soft bg-panel-deep;
+  .float {
+    @apply rounded-pane border border-rim-bright bg-plate-float shadow-float backdrop-blur-pane;
+  }
+
+  /* A card that lifts toward the viewer when pointed at. */
+  .card {
+    @apply rounded-card border border-rim-soft bg-plate-raised shadow-plate;
   }
 
   .field {
-    @apply w-full rounded-soft-sm border border-edge bg-panel-lift px-3 py-2
-           text-[13px] text-ink outline-none transition
+    @apply w-full rounded-pill border border-rim bg-black/25 px-3.5 py-2.5 text-[13px]
+           text-ink outline-none transition
            placeholder:text-ink-faint
-           focus:border-go/50 focus:ring-2 focus:ring-go/15;
+           focus:border-go/45 focus:bg-black/35 focus:ring-2 focus:ring-go/20;
   }
 
-  /* A keyboard key, as printed in the interface. */
   .kbd {
-    @apply inline-flex h-[18px] min-w-[18px] items-center justify-center rounded
-           border border-edge-bright bg-panel-lift px-1 font-mono text-[10.5px]
+    @apply inline-flex h-[19px] min-w-[19px] items-center justify-center rounded-[6px]
+           border border-rim bg-white/[0.07] px-1.5 font-mono text-[10.5px]
            font-semibold leading-none text-ink-muted;
   }
 }

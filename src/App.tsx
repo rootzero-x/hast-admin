@@ -145,53 +145,36 @@ function Shell({ me, onSignedOut }: { me: Me; onSignedOut: () => void }) {
   }, [me.permissions, me.is_founder, navigate]);
 
   return (
-    <div className="grid min-h-dvh gap-4 bg-panel-deep p-4 md:grid-cols-[228px_1fr]">
+    <div className="min-h-dvh lg:flex lg:gap-5 lg:p-5">
       <CommandPalette commands={commands} />
 
-      <aside className="surface flex flex-col p-4 md:flex-col">
-        <div className="flex items-center gap-2.5 px-1.5 pb-5 font-extrabold tracking-wide">
-          <svg viewBox="0 0 100 100" className="h-[30px] w-[30px] rounded-[8px]">
-            <rect width="100" height="100" rx="24" fill="#12A25F" />
-            <path
-              d="M22 48 L50 26 L78 48"
-              fill="none"
-              stroke="#fff"
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <circle cx="40" cy="62" r="7.5" fill="#fff" />
-            <circle cx="60" cy="62" r="7.5" fill="#fff" />
-          </svg>
+      {/*
+        Desktop: a glass pane that stays with the page while the content
+        scrolls beside it. Phone: nothing here - navigation lives at the
+        bottom, under the thumb, and a 232px column would eat the screen.
+      */}
+      <aside className="hidden lg:sticky lg:top-5 lg:flex lg:h-[calc(100dvh-2.5rem)] lg:w-[236px] lg:shrink-0 lg:flex-col lg:gap-4 pane p-4">
+        <div className="flex items-center gap-2.5 px-1.5 pt-1 font-extrabold tracking-wide">
+          <Logo />
           HAST
         </div>
 
-        {/* Said out loud, because a shortcut nobody is told about is a shortcut
-            nobody uses. It looks like a search field for the same reason. */}
+        {/* Said out loud, because a shortcut nobody is told about is a
+            shortcut nobody uses. It looks like search for the same reason. */}
         <button
           type="button"
           onClick={openCommandPalette}
-          className="mb-1 flex items-center gap-2 rounded-soft-sm border border-edge bg-panel-lift px-2.5 py-2 text-[12.5px] text-ink-faint transition-colors hover:border-edge-bright hover:text-ink-muted"
+          className="flex items-center gap-2 rounded-pill border border-rim bg-black/25 px-3 py-2.5 text-[12.5px] text-ink-faint transition hover:border-rim-bright hover:bg-black/35 hover:text-ink-muted"
         >
-          <svg
-            viewBox="0 0 20 20"
-            className="h-3.5 w-3.5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.9"
-            aria-hidden
-          >
-            <circle cx="9" cy="9" r="5.5" />
-            <path d="m13.2 13.2 3 3" strokeLinecap="round" />
-          </svg>
+          <SearchGlyph />
           <span className="flex-1 text-left">Qidirish</span>
           <kbd className="kbd">Ctrl K</kbd>
         </button>
 
-        <nav className="flex flex-col gap-1.5">
+        <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
           {visible.map((group) => (
             <div key={group.head}>
-              <div className="px-2 pb-1.5 pt-4 text-[10.5px] font-bold uppercase tracking-widest text-ink-faint">
+              <div className="px-3 pb-1.5 pt-4 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-faint">
                 {group.head}
               </div>
               {group.items.map((item) => (
@@ -201,41 +184,65 @@ function Shell({ me, onSignedOut }: { me: Me; onSignedOut: () => void }) {
                   end={item.to === '/'}
                   className={({ isActive }) =>
                     [
-                      'flex items-center justify-between rounded-soft-sm border px-3 py-2 text-[13.5px] transition-colors',
-                      // "You are here" is a lighter surface and a visible edge.
-                      // The inactive items keep a transparent border of the same
-                      // width so that nothing shifts by a pixel on selection.
+                      'flex items-center justify-between gap-2 rounded-pill border px-3 py-2.5 text-[13.5px]',
+                      'transition-[background-color,border-color,box-shadow] duration-150',
+                      // "You are here" is a pane that has risen toward the
+                      // viewer. Inactive items keep a transparent border of the
+                      // same width so nothing shifts by a pixel on selection.
                       isActive
-                        ? 'border-edge bg-panel-lift text-ink'
-                        : 'border-transparent text-ink-muted hover:bg-panel-lift/60 hover:text-ink',
+                        ? 'border-rim bg-white/[0.10] text-ink shadow-lift'
+                        : 'border-transparent text-ink-muted hover:bg-white/[0.05] hover:text-ink',
                     ].join(' ')
                   }
                 >
-                  <span>{item.label}</span>
-                  {item.badge && counts[item.badge] > 0 && (
-                    <span className="min-w-[20px] rounded-full border border-stop/35 bg-stop/10 px-1.5 py-[1px] text-center font-mono text-[11px] font-bold text-stop">
-                      {counts[item.badge]}
-                    </span>
-                  )}
+                  <span className="truncate">{item.label}</span>
+                  {item.badge && counts[item.badge] > 0 && <Badge n={counts[item.badge]} />}
                 </NavLink>
               ))}
             </div>
           ))}
         </nav>
 
-        <div className="mt-auto px-2 pt-4 text-[12.5px]">
-          <div>{me.name ?? me.email}</div>
-          <div className="text-ink-muted">{me.is_founder ? 'root' : me.role}</div>
-          <button onClick={() => void signOut()} className="mt-3 text-[13px] text-link hover:underline">
+        <div className="border-t border-rim-soft px-2 pt-3 text-[12.5px]">
+          <div className="truncate font-medium">{me.name ?? me.email}</div>
+          <div className="text-ink-faint">{me.is_founder ? 'root' : me.role}</div>
+          <button
+            onClick={() => void signOut()}
+            className="mt-2.5 text-[13px] text-link transition hover:brightness-125"
+          >
             Chiqish
           </button>
         </div>
       </aside>
 
-      <main className="flex min-w-0 flex-col gap-[18px]">
+      {/* Phone: a glass bar across the top carrying identity and search. */}
+      <header className="pane sticky top-0 z-40 mx-3 mt-3 flex items-center gap-3 rounded-pane px-4 py-3 lg:hidden">
+        <Logo />
+        <span className="font-extrabold tracking-wide">HAST</span>
+
+        <button
+          type="button"
+          onClick={openCommandPalette}
+          aria-label="Qidirish"
+          className="ml-auto grid h-9 w-9 place-items-center rounded-full border border-rim bg-black/25 text-ink-muted transition active:scale-95"
+        >
+          <SearchGlyph />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => void signOut()}
+          aria-label="Chiqish"
+          className="grid h-9 w-9 place-items-center rounded-full border border-rim bg-black/25 text-ink-muted transition active:scale-95"
+        >
+          <ExitGlyph />
+        </button>
+      </header>
+
+      <main className="flex min-w-0 flex-1 flex-col gap-4 p-3 pb-[calc(env(safe-area-inset-bottom)+5.75rem)] lg:p-0 lg:pb-0">
         {home === null ? (
-          <div className="surface p-6">
-            <h2 className="mb-2 text-lg font-bold">Ruxsat berilmagan</h2>
+          <div className="plate p-6">
+            <h2 className="mb-2 text-[17px] font-bold">Ruxsat berilmagan</h2>
             <p className="text-[13px] text-ink-muted">
               Hisobingiz administrator sifatida qoʻshilgan, lekin hech qanday ruxsat
               berilmagan. Asosiy administratordan soʻrang.
@@ -255,7 +262,78 @@ function Shell({ me, onSignedOut }: { me: Me; onSignedOut: () => void }) {
           </Routes>
         )}
       </main>
+
+      {/* Phone: the navigation, floating clear of the bottom edge. Flattened
+          out of its groups, because a phone bar has room for labels and not
+          for headings. */}
+      {home !== null && (
+        <nav className="pane fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 flex items-stretch justify-around gap-1 px-2 py-2 lg:hidden">
+          {visible.flatMap((group) => group.items).map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === '/'}
+              className={({ isActive }) =>
+                [
+                  'relative flex min-w-0 flex-1 flex-col items-center gap-1 rounded-pill px-1 py-2',
+                  'text-[10.5px] font-semibold transition-colors',
+                  isActive ? 'bg-white/[0.10] text-ink shadow-lift' : 'text-ink-faint',
+                ].join(' ')
+              }
+            >
+              <span className="truncate">{item.label}</span>
+              {item.badge && counts[item.badge] > 0 && (
+                <span className="absolute right-1.5 top-1 h-1.5 w-1.5 rounded-full bg-stop" />
+              )}
+            </NavLink>
+          ))}
+        </nav>
+      )}
     </div>
+  );
+}
+
+function Badge({ n }: { n: number }) {
+  return (
+    <span className="min-w-[20px] rounded-full border border-stop/40 bg-stop/20 px-1.5 py-[1px] text-center font-mono text-[11px] font-bold text-stop">
+      {n}
+    </span>
+  );
+}
+
+function Logo() {
+  return (
+    <svg viewBox="0 0 100 100" className="h-[30px] w-[30px] shrink-0 rounded-[9px]" aria-hidden>
+      <rect width="100" height="100" rx="24" fill="#12A25F" />
+      <path
+        d="M22 48 L50 26 L78 48"
+        fill="none"
+        stroke="#fff"
+        strokeWidth="8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="40" cy="62" r="7.5" fill="#fff" />
+      <circle cx="60" cy="62" r="7.5" fill="#fff" />
+    </svg>
+  );
+}
+
+function SearchGlyph() {
+  return (
+    <svg viewBox="0 0 20 20" className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.9" aria-hidden>
+      <circle cx="9" cy="9" r="5.5" />
+      <path d="m13.2 13.2 3 3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ExitGlyph() {
+  return (
+    <svg viewBox="0 0 20 20" className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.9" aria-hidden>
+      <path d="M12 6V4.8A1.8 1.8 0 0 0 10.2 3H5.8A1.8 1.8 0 0 0 4 4.8v10.4A1.8 1.8 0 0 0 5.8 17h4.4a1.8 1.8 0 0 0 1.8-1.8V14" strokeLinecap="round" />
+      <path d="M8.5 10H17m0 0-2.6-2.6M17 10l-2.6 2.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 
@@ -270,12 +348,16 @@ export function Screen({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <header className="surface flex items-center justify-between gap-4 px-6 py-4">
+    // Title and work sit on one plate rather than two. Two panes stacked with
+    // a gap between them read as two unrelated things, and a heading belongs
+    // to the table underneath it.
+    <section className="plate flex min-h-0 flex-1 flex-col">
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-rim-soft px-5 py-4 sm:px-6">
         <h2 className="text-[17px] font-bold tracking-tight">{title}</h2>
-        <div className="flex items-center gap-2.5">{actions}</div>
+        <div className="flex flex-wrap items-center gap-2.5">{actions}</div>
       </header>
-      <div className="surface flex-1 overflow-x-auto p-6">{children}</div>
-    </>
+
+      <div className="min-h-0 flex-1 p-4 sm:p-6">{children}</div>
+    </section>
   );
 }

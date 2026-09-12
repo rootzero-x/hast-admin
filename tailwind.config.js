@@ -1,18 +1,22 @@
 /**
  * The panel's design system, expressed once.
  *
- * A flat, dark console: surfaces are separated by a one-pixel edge and a small
- * step in lightness, never by a shadow. Nothing is raised, nothing is pressed,
- * nothing pretends to be a physical object.
+ * Spatial UI: the interface is a set of translucent plates floating at
+ * different depths above a lit environment, the way visionOS arranges a
+ * window. Hierarchy is carried by depth - how far a surface sits from the
+ * background, how much light its top edge catches, how far its shadow falls -
+ * rather than by lines drawn between things.
  *
- * That is a deliberate reversal of what this file used to hold. Soft shadows
- * read as craft on a landing page and as noise in a tool: this panel is mostly
- * dense tables of money, and every soft edge costs contrast the numbers need.
- * Depth here is carried by exactly two things - a lighter surface and a sharper
- * border - so a row, a panel and a dialog are told apart instantly.
+ * Two rules keep that from ruining a working tool:
  *
- * The token names are unchanged from the previous scheme on purpose, so the
- * views did not all have to be rewritten in order to be restyled.
+ * Glass is for chrome, never for data. Navigation, the top bar, dialogs and
+ * the command palette are glass; the plates holding tables of money are
+ * near-opaque, because text over a blurred moving background is harder to read
+ * and this panel is mostly numbers somebody is checking against a receipt.
+ *
+ * Blur is rationed. `backdrop-filter` is the most expensive thing a browser can
+ * be asked to composite and it multiplies per layer. A handful of large
+ * surfaces blur; a hundred table rows never do.
  */
 
 /** @type {import('tailwindcss').Config} */
@@ -21,59 +25,75 @@ export default {
   theme: {
     extend: {
       colors: {
-        panel: {
-          DEFAULT: '#16181D', // panels, the default surface
-          deep: '#101114', // the application ground, behind everything
-          lift: '#1C1F26', // hover, selected rows, inputs
+        // The environment: what everything else floats above and refracts.
+        env: {
+          DEFAULT: '#0B0F14',
+          deep: '#070A0E',
         },
-        // One pixel of edge does the work the shadows used to.
-        edge: {
-          DEFAULT: '#23262D',
-          soft: '#1D2027',
-          bright: '#2E323B',
+        // Plate fills. Alpha rather than solid, so depth reads through them -
+        // but high enough that type stays crisp.
+        plate: {
+          DEFAULT: 'rgba(24,29,38,0.72)',
+          raised: 'rgba(32,38,49,0.78)',
+          float: 'rgba(38,45,58,0.86)',
         },
-        // Type stays high contrast: the restraint belongs to the surfaces,
-        // never to the words.
+        // The lit top edge of a pane, and its shaded counterpart.
+        rim: {
+          DEFAULT: 'rgba(255,255,255,0.12)',
+          bright: 'rgba(255,255,255,0.20)',
+          soft: 'rgba(255,255,255,0.07)',
+        },
         ink: {
-          DEFAULT: '#E6E8EB',
-          muted: '#9096A0',
-          faint: '#6B717C',
+          DEFAULT: '#F2F5F8',
+          muted: '#A3ACB9',
+          faint: '#727C8A',
         },
-        go: '#35C27A',
-        stop: '#F0625E',
-        warn: '#E3B341',
-        link: '#6FB4FF',
-        hair: 'rgba(255,255,255,0.06)',
+        go: '#3DD68C',
+        stop: '#FF6B6B',
+        warn: '#F5C85C',
+        link: '#7FB8FF',
       },
       boxShadow: {
-        // The only shadows left are the two describing something genuinely
-        // floating above the page rather than moulded out of it.
-        pop: '0 16px 40px -12px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.07)',
-        sheet: '0 24px 64px -16px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.08)',
+        // The depth ladder. Each step casts wider and softer and catches a
+        // brighter top rim, so a raised thing reads as lit from above rather
+        // than merely outlined.
+        plate: '0 1px 0 0 rgba(255,255,255,0.07) inset, 0 8px 24px -8px rgba(0,0,0,0.55)',
+        raised: '0 1px 0 0 rgba(255,255,255,0.10) inset, 0 16px 40px -12px rgba(0,0,0,0.62)',
+        float: '0 1px 0 0 rgba(255,255,255,0.14) inset, 0 32px 72px -16px rgba(0,0,0,0.78)',
+        // What a control gains on hover: it comes toward the viewer.
+        lift: '0 1px 0 0 rgba(255,255,255,0.16) inset, 0 12px 28px -10px rgba(0,0,0,0.6)',
+        glow: '0 0 0 1px rgba(61,214,140,0.35), 0 12px 32px -10px rgba(61,214,140,0.35)',
       },
       borderRadius: {
-        // Tighter than the old scheme. A console reads as precise; generous
-        // corners make a dense table look like a row of pills.
-        soft: '10px',
-        'soft-sm': '7px',
+        // Generous and consistent. A spatial surface reads as a physical pane,
+        // and a pane with tight corners reads as a web page instead.
+        pane: '22px',
+        card: '16px',
+        pill: '11px',
+      },
+      backdropBlur: {
+        pane: '28px',
+        card: '14px',
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'Segoe UI', 'Roboto', 'system-ui', 'sans-serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'SF Mono', 'Menlo', 'Consolas', 'monospace'],
       },
       keyframes: {
-        pop: {
-          '0%': { opacity: '0', transform: 'translateY(-6px) scale(0.985)' },
+        rise: {
+          '0%': { opacity: '0', transform: 'translateY(10px) scale(0.985)' },
           '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
         },
-        fade: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+        fade: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+        sheet: {
+          '0%': { transform: 'translateY(16px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
         },
       },
       animation: {
-        pop: 'pop 0.13s cubic-bezier(0.22, 1, 0.36, 1) both',
-        fade: 'fade 0.13s ease-out both',
+        rise: 'rise 0.22s cubic-bezier(0.22, 1, 0.36, 1) both',
+        fade: 'fade 0.18s ease-out both',
+        sheet: 'sheet 0.26s cubic-bezier(0.22, 1, 0.36, 1) both',
       },
     },
   },
