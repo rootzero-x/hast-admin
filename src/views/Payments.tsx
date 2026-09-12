@@ -188,6 +188,22 @@ function Decide({
       toast(approve ? 'Tasdiqlandi' : 'Rad etildi');
       onDone();
     } catch (e) {
+      // `payment_closed` means the payment is no longer awaiting a decision -
+      // which usually means this very decision already landed. A slow moment on
+      // the host can see the request run twice: the first attempt approves, the
+      // second is refused, and the refusal is the only answer that comes back.
+      //
+      // The server is right to refuse it, and the guard is what stops a
+      // subscription being granted twice. But telling the admin "already
+      // reviewed" about the button they just pressed reads as a failure, and
+      // the honest recovery is to close and reload so they see the true state
+      // rather than press it again.
+      if (e instanceof ApiError && e.code === 'payment_closed') {
+        toast('Bu toʻlov allaqachon koʻrib chiqilgan — roʻyxat yangilandi');
+        onDone();
+        return;
+      }
+
       toast(e instanceof ApiError ? e.message : 'Bajarilmadi', true);
       setBusy(false);
     }
