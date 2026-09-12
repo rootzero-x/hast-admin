@@ -15,12 +15,22 @@
 /**
  * Where the API lives.
  *
- * Configurable so a local build can point at a staging server, but with a real
- * default: a fresh clone should work without a `.env` file that somebody has to
- * be told about.
+ * Configurable so a build can be pointed at staging, but with a real default:
+ * a fresh clone should work without a `.env` file somebody has to be told
+ * about.
+ *
+ * The default is the host's own address rather than `api.hast.uz`, because
+ * that subdomain is not finished. Its DNS resolves, but on the server it is
+ * still attached to an empty directory and has no certificate, so it answers
+ * 404 over HTTP and nothing at all over HTTPS. Pointing the panel at a name
+ * that does not serve the application would be tidier and completely broken.
+ *
+ * When the subdomain is given the application's document root and a
+ * certificate, this becomes one line - or one environment variable in Vercel,
+ * with no deploy at all.
  */
 export const API_BASE: string =
-  import.meta.env.VITE_API_BASE ?? 'https://api.hast.uz/api/v1';
+  import.meta.env.VITE_API_BASE ?? 'https://694fc8f1e1918.myxvest1.ru/rental-app/api/v1';
 
 const TOKEN_KEY = 'hast.admin.token';
 
