@@ -1,14 +1,18 @@
 /**
  * The panel's design system, expressed once.
  *
- * Soft UI (neomorphism): every surface is the same colour as its background and
- * exists only because of two shadows — a light one from the top left and a dark
- * one from the bottom right, as though the whole interface were pressed out of a
- * single sheet. Raised things cast outward, pressed things cast inward.
+ * A flat, dark console: surfaces are separated by a one-pixel edge and a small
+ * step in lightness, never by a shadow. Nothing is raised, nothing is pressed,
+ * nothing pretends to be a physical object.
  *
- * The shadows live here rather than being retyped as arbitrary values across
- * fifty components, because the moment two of them differ the illusion of a
- * single sheet breaks and nobody can say why it looks wrong.
+ * That is a deliberate reversal of what this file used to hold. Soft shadows
+ * read as craft on a landing page and as noise in a tool: this panel is mostly
+ * dense tables of money, and every soft edge costs contrast the numbers need.
+ * Depth here is carried by exactly two things - a lighter surface and a sharper
+ * border - so a row, a panel and a dialog are told apart instantly.
+ *
+ * The token names are unchanged from the previous scheme on purpose, so the
+ * views did not all have to be rewritten in order to be restyled.
  */
 
 /** @type {import('tailwindcss').Config} */
@@ -17,39 +21,59 @@ export default {
   theme: {
     extend: {
       colors: {
-        // The sheet. Everything is cut from these three.
-        base: {
-          DEFAULT: '#23262D',
-          deep: '#1E2128',
-          lift: '#272B33',
+        panel: {
+          DEFAULT: '#16181D', // panels, the default surface
+          deep: '#101114', // the application ground, behind everything
+          lift: '#1C1F26', // hover, selected rows, inputs
         },
-        // Type stays high contrast on purpose: the softness belongs to the
-        // surfaces, never to the words. Soft UI's usual failing is unreadable
-        // text, and this panel is mostly tables of money.
+        // One pixel of edge does the work the shadows used to.
+        edge: {
+          DEFAULT: '#23262D',
+          soft: '#1D2027',
+          bright: '#2E323B',
+        },
+        // Type stays high contrast: the restraint belongs to the surfaces,
+        // never to the words.
         ink: {
-          DEFAULT: '#EEF2F6',
-          muted: '#98A2AE',
-          faint: '#6E7884',
+          DEFAULT: '#E6E8EB',
+          muted: '#9096A0',
+          faint: '#6B717C',
         },
         go: '#35C27A',
         stop: '#F0625E',
         warn: '#E3B341',
         link: '#6FB4FF',
-        hair: 'rgba(255,255,255,0.05)',
+        hair: 'rgba(255,255,255,0.06)',
       },
       boxShadow: {
-        raise: '-5px -5px 12px rgba(255,255,255,0.055), 5px 5px 14px rgba(0,0,0,0.46)',
-        'raise-sm': '-3px -3px 7px rgba(255,255,255,0.055), 3px 3px 8px rgba(0,0,0,0.46)',
-        press: 'inset -3px -3px 7px rgba(255,255,255,0.055), inset 3px 3px 8px rgba(0,0,0,0.46)',
-        'press-sm': 'inset -2px -2px 5px rgba(255,255,255,0.055), inset 2px 2px 6px rgba(0,0,0,0.46)',
+        // The only shadows left are the two describing something genuinely
+        // floating above the page rather than moulded out of it.
+        pop: '0 16px 40px -12px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.07)',
+        sheet: '0 24px 64px -16px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.08)',
       },
       borderRadius: {
-        soft: '16px',
-        'soft-sm': '11px',
+        // Tighter than the old scheme. A console reads as precise; generous
+        // corners make a dense table look like a row of pills.
+        soft: '10px',
+        'soft-sm': '7px',
       },
       fontFamily: {
-        sans: ['-apple-system', 'Segoe UI', 'Roboto', 'system-ui', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'Segoe UI', 'Roboto', 'system-ui', 'sans-serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'SF Mono', 'Menlo', 'Consolas', 'monospace'],
+      },
+      keyframes: {
+        pop: {
+          '0%': { opacity: '0', transform: 'translateY(-6px) scale(0.985)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+        fade: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
+      animation: {
+        pop: 'pop 0.13s cubic-bezier(0.22, 1, 0.36, 1) both',
+        fade: 'fade 0.13s ease-out both',
       },
     },
   },

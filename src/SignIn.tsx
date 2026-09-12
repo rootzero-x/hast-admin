@@ -38,7 +38,7 @@ declare global {
 
 function Mark() {
   return (
-    <svg viewBox="0 0 100 100" className="mx-auto mb-5 h-16 w-16 rounded-[20px] p-2 shadow-press-sm">
+    <svg viewBox="0 0 100 100" className="mx-auto mb-5 h-16 w-16 rounded-soft border border-edge bg-panel-lift p-2">
       <rect width="100" height="100" rx="24" fill="#12A25F" />
       <path
         d="M22 48 L50 26 L78 48"
@@ -128,6 +128,12 @@ function FirstStep({
         callback: (response) => void handleGoogle(response.credential),
       });
 
+      // Google appends rather than replaces, so the slot is emptied first.
+      // Without this, the effect running a second time - React's development
+      // double mount, or simply a new `handleGoogle` identity from the parent -
+      // leaves two identical "Sign in with Google" buttons stacked on the card.
+      googleSlot.current.replaceChildren();
+
       window.google.accounts.id.renderButton(googleSlot.current, {
         theme: 'filled_black',
         size: 'large',
@@ -208,7 +214,7 @@ function FirstStep({
 
       {/* Google draws its own button and will not be restyled, so it is given a
           pressed well to sit in rather than looking pasted on. */}
-      <div ref={googleSlot} className="flex min-h-[44px] justify-center rounded-[13px] p-1.5 shadow-press-sm" />
+      <div ref={googleSlot} className="flex min-h-[44px] justify-center rounded-soft-sm border border-edge bg-panel-lift p-1.5" />
 
       <div className="relative my-5 text-[11.5px] uppercase tracking-wider text-ink-faint">
         <span className="absolute left-0 top-1/2 h-px w-[calc(50%-28px)] bg-hair" />
@@ -320,7 +326,7 @@ function SecondStep({
           setCode(digits);
           if (digits.length === 6) void submit(digits);
         }}
-        className="my-5 w-full rounded-soft-sm bg-base p-4 text-center font-mono text-[27px] font-bold tracking-[11px] text-ink shadow-press outline-none focus:ring-2 focus:ring-go/35"
+        className="my-5 w-full rounded-soft-sm border border-edge bg-panel-lift p-4 text-center font-mono text-[27px] font-bold tracking-[11px] text-ink outline-none focus:ring-2 focus:ring-go/35"
       />
 
       <Button busy={busy} onClick={() => void submit(code)}>

@@ -5,10 +5,10 @@
 /*
  * Only what Tailwind cannot express in a class.
  *
- * Everything else belongs in the markup, where it can be seen next to the thing
- * it styles - the whole point of choosing Tailwind. What lands here is the
- * handful of rules that have no element to hang off: the document itself, the
- * scrollbars, and the browser chrome for dialogs and autofill.
+ * Everything else belongs in the markup, next to the thing it styles - the
+ * whole point of choosing Tailwind. What lands here is the handful of rules
+ * with no element to hang off: the document itself, the scrollbars, and the
+ * browser chrome for dialogs and autofill.
  */
 
 @layer base {
@@ -19,17 +19,18 @@
   }
 
   body {
-    @apply bg-base text-ink font-sans antialiased;
+    @apply bg-panel-deep font-sans text-ink antialiased;
   }
 
   ::selection {
-    background: rgba(53, 194, 122, 0.28);
+    background: rgba(53, 194, 122, 0.3);
   }
 
-  /* A hard scrollbar cuts a straight line through a soft interface. */
+  /* Thin and dark, so it belongs to the panel rather than the operating
+     system. A default scrollbar is the loudest thing on a dark screen. */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #33373f transparent;
+    scrollbar-color: #2e323b transparent;
   }
 
   *::-webkit-scrollbar {
@@ -42,48 +43,59 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background: #33373f;
+    background: #2e323b;
     border-radius: 99px;
-    border: 3px solid #23262d;
+    border: 3px solid #101114;
   }
 
   /* Chrome paints autofilled inputs bright blue, which looks like a bug in a
      dark interface. The inset shadow trick is the only way to override it. */
   input:-webkit-autofill,
   input:-webkit-autofill:focus {
-    -webkit-text-fill-color: #eef2f6;
-    -webkit-box-shadow: 0 0 0 1000px #23262d inset;
+    -webkit-text-fill-color: #e6e8eb;
+    -webkit-box-shadow: 0 0 0 1000px #1c1f26 inset;
     transition: background-color 9999s ease-out;
   }
 
   dialog::backdrop {
-    background: rgba(10, 12, 15, 0.72);
-    backdrop-filter: blur(3px);
+    background: rgba(6, 8, 11, 0.72);
+    backdrop-filter: blur(2px);
   }
 }
 
 @layer components {
   /*
-   * The three surfaces the whole panel is built from. They are components
-   * rather than repeated utility strings because the shadow pair *is* the
-   * design: if two of them drift apart the single-sheet illusion breaks, and
-   * the fix is then to hunt through the markup for which one is wrong.
+   * The three surfaces the whole panel is built from.
+   *
+   * They are components rather than repeated utility strings because the pair
+   * of (background step, border) *is* the design: if two of them drift apart,
+   * the flat hierarchy stops reading and the fix is to hunt through the markup
+   * for which one is wrong.
    */
   .surface {
-    @apply bg-base rounded-soft shadow-raise;
+    @apply rounded-soft border border-edge bg-panel;
   }
 
   .surface-sm {
-    @apply bg-base rounded-soft-sm shadow-raise-sm;
+    @apply rounded-soft-sm border border-edge bg-panel;
   }
 
+  /* A recess: one step darker than the panel it sits in. */
   .well {
-    @apply bg-base rounded-soft-sm shadow-press-sm;
+    @apply rounded-soft-sm border border-edge-soft bg-panel-deep;
   }
 
   .field {
-    @apply w-full rounded-soft-sm bg-base px-3.5 py-2.5 text-[13px]
-           text-ink shadow-press-sm outline-none
-           focus:ring-2 focus:ring-go/30;
+    @apply w-full rounded-soft-sm border border-edge bg-panel-lift px-3 py-2
+           text-[13px] text-ink outline-none transition
+           placeholder:text-ink-faint
+           focus:border-go/50 focus:ring-2 focus:ring-go/15;
+  }
+
+  /* A keyboard key, as printed in the interface. */
+  .kbd {
+    @apply inline-flex h-[18px] min-w-[18px] items-center justify-center rounded
+           border border-edge-bright bg-panel-lift px-1 font-mono text-[10.5px]
+           font-semibold leading-none text-ink-muted;
   }
 }

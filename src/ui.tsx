@@ -1,10 +1,10 @@
 /**
  * The pieces the panel is assembled from.
  *
- * Kept together because soft UI only holds together if every surface agrees:
- * the same two shadows, the same radii, the same press on interaction. Scatter
- * these across twenty files and within a week three buttons will look subtly
- * different and nobody will be able to say which is right.
+ * Kept together because a flat interface only holds together if every surface
+ * agrees: the same step in lightness, the same one-pixel edge, the same radii.
+ * Scatter these across twenty files and within a week three buttons will look
+ * subtly different and nobody will be able to say which is right.
  */
 
 import {
@@ -24,11 +24,15 @@ import {
 type Tone = 'go' | 'quiet' | 'danger';
 
 const TONE: Record<Tone, string> = {
-  // The colour is in the text, never a filled slab. Filling a button would
-  // break the single-sheet illusion everything else depends on.
-  go: 'text-go',
-  quiet: 'text-ink',
-  danger: 'text-stop',
+  // One filled button per dialog, and it is the one that commits. When every
+  // button is an outline the eye has to read all of them to find the action,
+  // which is exactly the moment - approving money - where it should not have
+  // to. `quiet` is the default for everything that is not the commit, and
+  // `danger` earns colour without a fill because rejecting is destructive and
+  // should never be the easiest thing to hit.
+  go: 'bg-go text-[#07130D] border-go hover:bg-[#43D189] hover:border-[#43D189]',
+  quiet: 'bg-panel-lift text-ink border-edge hover:border-edge-bright hover:bg-[#22262E]',
+  danger: 'bg-panel-lift text-stop border-edge hover:border-stop/45 hover:bg-stop/10',
 };
 
 export function Button({
@@ -56,11 +60,12 @@ export function Button({
       onClick={onClick}
       disabled={off}
       className={[
-        'bg-base font-semibold transition-shadow select-none',
-        small ? 'rounded-[9px] px-3.5 py-2 text-[12.5px]' : 'rounded-soft-sm px-4 py-3 text-sm',
-        // Pressing sinks the button into the sheet rather than tinting it -
-        // the whole grammar of the style in one line.
-        off ? 'text-ink-faint shadow-press-sm cursor-default' : `${TONE[tone]} shadow-raise-sm active:shadow-press-sm hover:brightness-110`,
+        'select-none border font-semibold transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-go/40',
+        small ? 'rounded-soft-sm px-3 py-1.5 text-[12.5px]' : 'rounded-soft-sm px-4 py-2.5 text-sm',
+        off
+          ? 'cursor-default border-edge-soft bg-panel-lift text-ink-faint'
+          : `${TONE[tone]} active:translate-y-px`,
       ].join(' ')}
     >
       {busy ? '…' : children}
@@ -86,11 +91,23 @@ export function Stat({
   alert?: boolean;
 }) {
   return (
-    <div className={`bg-base rounded-soft-sm p-5 ${alert ? 'shadow-press-sm' : 'shadow-raise-sm'}`}>
-      <div className={`font-mono text-[25px] font-extrabold leading-tight tracking-tight ${alert ? 'text-stop' : ''}`}>
+    <div
+      className={
+        'rounded-soft border bg-panel px-4 py-3.5 ' +
+        // A queue with something in it is the only thing on this screen that
+        // is asking for work, so it is the only thing allowed to use colour.
+        (alert ? 'border-stop/35 bg-stop/[0.06]' : 'border-edge')
+      }
+    >
+      <div
+        className={
+          'font-mono text-[24px] font-extrabold leading-none tracking-tight ' +
+          (alert ? 'text-stop' : 'text-ink')
+        }
+      >
         {value}
       </div>
-      <div className="mt-0.5 text-xs text-ink-muted">{label}</div>
+      <div className="mt-1.5 text-[11.5px] font-medium text-ink-muted">{label}</div>
     </div>
   );
 }
@@ -101,17 +118,32 @@ export function Notice({ children }: { children: ReactNode }) {
 
 export function Tag({ children, tone }: { children: ReactNode; tone: Tone | 'flat' | 'warn' }) {
   const colour =
-    tone === 'go' ? 'text-go' : tone === 'danger' ? 'text-stop' : tone === 'warn' ? 'text-warn' : 'text-ink-muted';
+    tone === 'go'
+      ? 'border-go/35 bg-go/10 text-go'
+      : tone === 'danger'
+        ? 'border-stop/35 bg-stop/10 text-stop'
+        : tone === 'warn'
+          ? 'border-warn/35 bg-warn/10 text-warn'
+          : 'border-edge bg-panel-lift text-ink-muted';
 
   return (
-    <span className={`inline-block whitespace-nowrap rounded-full px-2.5 py-[3px] text-[11.5px] font-semibold shadow-press-sm ${colour}`}>
+    <span
+      className={
+        'inline-block whitespace-nowrap rounded-full border px-2 py-[2px] text-[11px] font-semibold ' +
+        colour
+      }
+    >
       {children}
     </span>
   );
 }
 
 export function Code({ children }: { children: ReactNode }) {
-  return <code className="rounded-md px-1.5 py-0.5 font-mono text-xs shadow-press-sm">{children}</code>;
+  return (
+    <code className="rounded border border-edge bg-panel-lift px-1.5 py-0.5 font-mono text-xs">
+      {children}
+    </code>
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -119,11 +151,13 @@ export function Code({ children }: { children: ReactNode }) {
 /* -------------------------------------------------------------------------- */
 
 /**
- * Deliberately *not* a shadow per row.
+ * One hairline per row, and nothing else.
  *
- * Fifty shadowed rows in a column is a quilt, not a table. One hairline each is
- * what keeps a payment queue scannable, and legibility wins over style wherever
- * the two disagree.
+ * No card, no border around each row, no zebra stripe. Fifty framed rows in a
+ * column is a quilt, not a table; a single rule between them is what keeps a
+ * payment queue scannable, and legibility wins over decoration wherever the two
+ * disagree. The only interactive dressing is a barely-there row highlight, so
+ * the eye can follow a long row across to its buttons.
  */
 export function Table({ head, children }: { head: ReactNode[]; children: ReactNode }) {
   return (
@@ -261,10 +295,10 @@ export function Dialog({
         event.preventDefault();
         onClose();
       }}
-      className="max-w-[min(92vw,580px)] rounded-[22px] border-0 bg-base p-0 text-ink shadow-raise"
+      className="max-w-[min(92vw,580px)] rounded-soft border border-edge-bright bg-panel p-0 text-ink shadow-sheet backdrop:animate-fade"
     >
       <div className="p-6">
-        <h3 className="mb-3.5 text-base font-bold">{title}</h3>
+        <h3 className="mb-3.5 text-[15px] font-bold">{title}</h3>
         {children}
       </div>
       <div className="flex justify-end gap-2.5 px-6 pb-5">

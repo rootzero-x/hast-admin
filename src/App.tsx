@@ -9,10 +9,11 @@
  * that feels broken.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { NavLink, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 
 import { api, session, whenSessionLost } from './api';
+import { CommandPalette, openCommandPalette, type Command } from './CommandPalette';
 import { SignIn } from './SignIn';
 import type { Me } from './types';
 import { Loading, ToastHost, useToast } from './ui';
@@ -121,11 +122,35 @@ function Shell({ me, onSignedOut }: { me: Me; onSignedOut: () => void }) {
   // loading failure.
   const home = visible[0]?.items[0]?.to ?? null;
 
+  // Built from the same filtered list the sidebar draws, so the palette can
+  // never offer a page the sidebar has hidden.
+  const commands = useMemo<Command[]>(() => {
+    const destinations = visible.flatMap((group) =>
+      group.items.map((item) => ({
+        id: item.to,
+        label: item.label,
+        group: group.head,
+        run: () => navigate(item.to),
+      })),
+    );
+
+    return [
+      ...destinations,
+      { id: 'sign-out', label: 'Chiqish', group: 'Hisob', run: () => void signOut() },
+    ];
+    // `visible` is derived fresh on every render, so it cannot be a dependency
+    // without rebuilding this list every time; the permissions it comes from
+    // are what actually change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [me.permissions, me.is_founder, navigate]);
+
   return (
-    <div className="grid min-h-dvh gap-[18px] p-[18px] md:grid-cols-[232px_1fr]">
-      <aside className="surface flex flex-col p-5 md:flex-col">
+    <div className="grid min-h-dvh gap-4 bg-panel-deep p-4 md:grid-cols-[228px_1fr]">
+      <CommandPalette commands={commands} />
+
+      <aside className="surface flex flex-col p-4 md:flex-col">
         <div className="flex items-center gap-2.5 px-1.5 pb-5 font-extrabold tracking-wide">
-          <svg viewBox="0 0 100 100" className="h-[30px] w-[30px] rounded-[10px] shadow-raise-sm">
+          <svg viewBox="0 0 100 100" className="h-[30px] w-[30px] rounded-[8px]">
             <rect width="100" height="100" rx="24" fill="#12A25F" />
             <path
               d="M22 48 L50 26 L78 48"
@@ -141,6 +166,28 @@ function Shell({ me, onSignedOut }: { me: Me; onSignedOut: () => void }) {
           HAST
         </div>
 
+        {/* Said out loud, because a shortcut nobody is told about is a shortcut
+            nobody uses. It looks like a search field for the same reason. */}
+        <button
+          type="button"
+          onClick={openCommandPalette}
+          className="mb-1 flex items-center gap-2 rounded-soft-sm border border-edge bg-panel-lift px-2.5 py-2 text-[12.5px] text-ink-faint transition-colors hover:border-edge-bright hover:text-ink-muted"
+        >
+          <svg
+            viewBox="0 0 20 20"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.9"
+            aria-hidden
+          >
+            <circle cx="9" cy="9" r="5.5" />
+            <path d="m13.2 13.2 3 3" strokeLinecap="round" />
+          </svg>
+          <span className="flex-1 text-left">Qidirish</span>
+          <kbd className="kbd">Ctrl K</kbd>
+        </button>
+
         <nav className="flex flex-col gap-1.5">
           {visible.map((group) => (
             <div key={group.head}>
@@ -154,19 +201,19 @@ function Shell({ me, onSignedOut }: { me: Me; onSignedOut: () => void }) {
                   end={item.to === '/'}
                   className={({ isActive }) =>
                     [
-                      'flex items-center justify-between rounded-[10px] px-3.5 py-2.5 text-[13.5px] transition-shadow',
-                      // The current page is pressed into the sheet. In a style
-                      // with no borders it is the clearest "you are here"
-                      // available.
+                      'flex items-center justify-between rounded-soft-sm border px-3 py-2 text-[13.5px] transition-colors',
+                      // "You are here" is a lighter surface and a visible edge.
+                      // The inactive items keep a transparent border of the same
+                      // width so that nothing shifts by a pixel on selection.
                       isActive
-                        ? 'text-ink shadow-press-sm'
-                        : 'text-ink-muted hover:text-ink hover:shadow-raise-sm',
+                        ? 'border-edge bg-panel-lift text-ink'
+                        : 'border-transparent text-ink-muted hover:bg-panel-lift/60 hover:text-ink',
                     ].join(' ')
                   }
                 >
                   <span>{item.label}</span>
                   {item.badge && counts[item.badge] > 0 && (
-                    <span className="min-w-[21px] rounded-full px-1.5 py-0.5 text-center font-mono text-[11px] font-bold text-stop shadow-press-sm">
+                    <span className="min-w-[20px] rounded-full border border-stop/35 bg-stop/10 px-1.5 py-[1px] text-center font-mono text-[11px] font-bold text-stop">
                       {counts[item.badge]}
                     </span>
                   )}
