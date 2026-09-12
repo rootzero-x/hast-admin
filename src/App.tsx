@@ -164,7 +164,7 @@ function Shell({ me, onSignedOut }: { me: Me; onSignedOut: () => void }) {
         <button
           type="button"
           onClick={openCommandPalette}
-          className="flex items-center gap-2 rounded-pill border border-rim bg-black/25 px-3 py-2.5 text-[12.5px] text-ink-faint transition hover:border-rim-bright hover:bg-black/35 hover:text-ink-muted"
+          className="flex items-center gap-2 rounded-pill border border-rim bg-white/70 px-3 py-2.5 text-[12.5px] text-ink-faint transition hover:border-white/80 hover:bg-white hover:text-ink-muted"
         >
           <SearchGlyph />
           <span className="flex-1 text-left">Qidirish</span>
@@ -190,8 +190,8 @@ function Shell({ me, onSignedOut }: { me: Me; onSignedOut: () => void }) {
                       // viewer. Inactive items keep a transparent border of the
                       // same width so nothing shifts by a pixel on selection.
                       isActive
-                        ? 'border-rim bg-white/[0.10] text-ink shadow-lift'
-                        : 'border-transparent text-ink-muted hover:bg-white/[0.05] hover:text-ink',
+                        ? 'border-rim bg-white text-ink shadow-lift'
+                        : 'border-transparent text-ink-muted hover:bg-white/60 hover:text-ink',
                     ].join(' ')
                   }
                 >
@@ -224,7 +224,7 @@ function Shell({ me, onSignedOut }: { me: Me; onSignedOut: () => void }) {
           type="button"
           onClick={openCommandPalette}
           aria-label="Qidirish"
-          className="ml-auto grid h-9 w-9 place-items-center rounded-full border border-rim bg-black/25 text-ink-muted transition active:scale-95"
+          className="ml-auto grid h-9 w-9 place-items-center rounded-full border border-rim bg-white/70 text-ink-muted transition active:scale-95"
         >
           <SearchGlyph />
         </button>
@@ -233,7 +233,7 @@ function Shell({ me, onSignedOut }: { me: Me; onSignedOut: () => void }) {
           type="button"
           onClick={() => void signOut()}
           aria-label="Chiqish"
-          className="grid h-9 w-9 place-items-center rounded-full border border-rim bg-black/25 text-ink-muted transition active:scale-95"
+          className="grid h-9 w-9 place-items-center rounded-full border border-rim bg-white/70 text-ink-muted transition active:scale-95"
         >
           <ExitGlyph />
         </button>
@@ -277,7 +277,7 @@ function Shell({ me, onSignedOut }: { me: Me; onSignedOut: () => void }) {
                 [
                   'relative flex min-w-0 flex-1 flex-col items-center gap-1 rounded-pill px-1 py-2',
                   'text-[10.5px] font-semibold transition-colors',
-                  isActive ? 'bg-white/[0.10] text-ink shadow-lift' : 'text-ink-faint',
+                  isActive ? 'bg-white text-ink shadow-lift' : 'text-ink-faint',
                 ].join(' ')
               }
             >

@@ -1,22 +1,25 @@
 /**
  * The panel's design system, expressed once.
  *
- * Spatial UI: the interface is a set of translucent plates floating at
- * different depths above a lit environment, the way visionOS arranges a
- * window. Hierarchy is carried by depth - how far a surface sits from the
- * background, how much light its top edge catches, how far its shadow falls -
- * rather than by lines drawn between things.
+ * Liquid glass, in daylight. Surfaces are thin sheets of white glass laid over
+ * a softly lit room: they let the colour behind them through, saturate it
+ * slightly the way real glass does, catch a bright specular line along their
+ * top edge, and drop a soft shadow onto whatever is beneath.
  *
- * Two rules keep that from ruining a working tool:
+ * Bright rather than dark, and that is the point. This is a tool somebody works
+ * in for an hour at a time reading rows of money, and dark type on a light
+ * sheet is what the eye does best; the previous dark schemes looked handsome in
+ * a screenshot and tiring in use.
  *
- * Glass is for chrome, never for data. Navigation, the top bar, dialogs and
- * the command palette are glass; the plates holding tables of money are
- * near-opaque, because text over a blurred moving background is harder to read
- * and this panel is mostly numbers somebody is checking against a receipt.
+ * Two rules keep the material from eating the tool:
+ *
+ * Glass is for chrome, never for data. Navigation, the top bar, dialogs and the
+ * command palette are glass. The sheets that carry tables are nearly opaque,
+ * because a number being checked against a paper receipt must not shimmer.
  *
  * Blur is rationed. `backdrop-filter` is the most expensive thing a browser can
- * be asked to composite and it multiplies per layer. A handful of large
- * surfaces blur; a hundred table rows never do.
+ * be asked to composite and it multiplies per layer, so a handful of large
+ * surfaces blur and a hundred table rows never do.
  */
 
 /** @type {import('tailwindcss').Config} */
@@ -25,55 +28,57 @@ export default {
   theme: {
     extend: {
       colors: {
-        // The environment: what everything else floats above and refracts.
-        env: {
-          DEFAULT: '#0B0F14',
-          deep: '#070A0E',
+        // The room the glass is lit by.
+        room: {
+          DEFAULT: '#EEF2F8',
+          deep: '#E4EAF3',
         },
-        // Plate fills. Alpha rather than solid, so depth reads through them -
-        // but high enough that type stays crisp.
-        plate: {
-          DEFAULT: 'rgba(24,29,38,0.72)',
-          raised: 'rgba(32,38,49,0.78)',
-          float: 'rgba(38,45,58,0.86)',
+        // Sheet fills: white at three thicknesses.
+        sheet: {
+          thin: 'rgba(255,255,255,0.62)',
+          DEFAULT: 'rgba(255,255,255,0.78)',
+          thick: 'rgba(255,255,255,0.92)',
+          solid: '#FFFFFF',
         },
-        // The lit top edge of a pane, and its shaded counterpart.
+        // The specular line along a lit edge, and the hairline that separates
+        // two sheets of the same brightness.
         rim: {
-          DEFAULT: 'rgba(255,255,255,0.12)',
-          bright: 'rgba(255,255,255,0.20)',
-          soft: 'rgba(255,255,255,0.07)',
+          DEFAULT: 'rgba(15,23,42,0.09)',
+          soft: 'rgba(15,23,42,0.06)',
+          strong: 'rgba(15,23,42,0.14)',
         },
         ink: {
-          DEFAULT: '#F2F5F8',
-          muted: '#A3ACB9',
-          faint: '#727C8A',
+          DEFAULT: '#0F172A',
+          muted: '#55627A',
+          faint: '#8A95A8',
         },
-        go: '#3DD68C',
-        stop: '#FF6B6B',
-        warn: '#F5C85C',
-        link: '#7FB8FF',
+        go: '#0FA968',
+        stop: '#E5484D',
+        warn: '#B76E00',
+        link: '#2563EB',
       },
       boxShadow: {
-        // The depth ladder. Each step casts wider and softer and catches a
-        // brighter top rim, so a raised thing reads as lit from above rather
-        // than merely outlined.
-        plate: '0 1px 0 0 rgba(255,255,255,0.07) inset, 0 8px 24px -8px rgba(0,0,0,0.55)',
-        raised: '0 1px 0 0 rgba(255,255,255,0.10) inset, 0 16px 40px -12px rgba(0,0,0,0.62)',
-        float: '0 1px 0 0 rgba(255,255,255,0.14) inset, 0 32px 72px -16px rgba(0,0,0,0.78)',
-        // What a control gains on hover: it comes toward the viewer.
-        lift: '0 1px 0 0 rgba(255,255,255,0.16) inset, 0 12px 28px -10px rgba(0,0,0,0.6)',
-        glow: '0 0 0 1px rgba(61,214,140,0.35), 0 12px 32px -10px rgba(61,214,140,0.35)',
+        // Every sheet carries the same two ingredients: a white line along the
+        // top edge where the light catches, and a soft shadow cast downward.
+        glass: '0 1px 0 0 rgba(255,255,255,0.85) inset, 0 6px 20px -8px rgba(15,23,42,0.14)',
+        raised: '0 1px 0 0 rgba(255,255,255,0.9) inset, 0 18px 44px -14px rgba(15,23,42,0.20)',
+        float: '0 1px 0 0 rgba(255,255,255,0.95) inset, 0 36px 80px -20px rgba(15,23,42,0.32)',
+        lift: '0 1px 0 0 rgba(255,255,255,0.9) inset, 0 10px 26px -10px rgba(15,23,42,0.22)',
+        glow: '0 0 0 3px rgba(15,169,104,0.16)',
       },
       borderRadius: {
-        // Generous and consistent. A spatial surface reads as a physical pane,
-        // and a pane with tight corners reads as a web page instead.
-        pane: '22px',
-        card: '16px',
-        pill: '11px',
+        // Capsule-leaning, the way liquid glass reads: a sheet is a lozenge,
+        // not a rectangle with the corners knocked off.
+        pane: '24px',
+        card: '18px',
+        pill: '12px',
       },
       backdropBlur: {
-        pane: '28px',
-        card: '14px',
+        pane: '30px',
+        card: '16px',
+      },
+      backdropSaturate: {
+        glass: '1.8',
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'Segoe UI', 'Roboto', 'system-ui', 'sans-serif'],

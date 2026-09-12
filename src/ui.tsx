@@ -32,8 +32,8 @@ const TONE: Record<Tone, string> = {
   // One solid button per screen, and it is the one that commits. When every
   // control is glass the eye has to read all of them to find the action, which
   // is the wrong moment to think - it is usually approving somebody's money.
-  go: 'bg-go text-[#05130C] border-go/60 hover:bg-[#4FE39B] hover:shadow-glow',
-  quiet: 'bg-white/[0.07] text-ink border-rim hover:bg-white/[0.12] hover:border-rim-bright hover:shadow-lift',
+  go: 'bg-go text-white border-go/60 hover:bg-[#0C9159] hover:shadow-glow',
+  quiet: 'bg-white/70 text-ink border-rim hover:bg-white hover:border-white/80 hover:shadow-lift',
   danger: 'bg-stop/12 text-stop border-stop/30 hover:bg-stop/20 hover:border-stop/50 hover:shadow-lift',
 };
 
@@ -68,7 +68,7 @@ export function Button({
         // Touch targets stay finger-sized on a phone even in the compact size.
         small ? 'px-3.5 py-2 text-[12.5px]' : 'px-5 py-2.5 text-sm',
         off
-          ? 'cursor-default border-rim-soft bg-white/[0.04] text-ink-faint'
+          ? 'cursor-default border-rim-soft bg-white/70 text-ink-faint'
           : `${TONE[tone]} active:translate-y-px`,
       ].join(' ')}
     >
@@ -132,7 +132,7 @@ export function Tag({ children, tone }: { children: ReactNode; tone: Tone | 'fla
         ? 'border-stop/35 bg-stop/15 text-stop'
         : tone === 'warn'
           ? 'border-warn/35 bg-warn/15 text-warn'
-          : 'border-rim bg-white/[0.07] text-ink-muted';
+          : 'border-rim bg-white/70 text-ink-muted';
 
   return (
     <span
@@ -148,7 +148,7 @@ export function Tag({ children, tone }: { children: ReactNode; tone: Tone | 'fla
 
 export function Code({ children }: { children: ReactNode }) {
   return (
-    <code className="rounded-[6px] border border-rim bg-black/30 px-1.5 py-0.5 font-mono text-xs">
+    <code className="rounded-[6px] border border-rim bg-room-deep px-1.5 py-0.5 font-mono text-xs">
       {children}
     </code>
   );
@@ -203,9 +203,9 @@ export function Row({ children }: { children: ReactNode }) {
   return (
     <tr
       className={
-        'transition-colors hover:bg-white/[0.035] ' +
+        'transition-colors hover:bg-go/[0.05] ' +
         'max-lg:block max-lg:rounded-card max-lg:border max-lg:border-rim-soft ' +
-        'max-lg:bg-white/[0.04] max-lg:p-3.5'
+        'max-lg:bg-white/70 max-lg:p-3.5'
       }
     >
       {Children.map(children, (child, i) =>

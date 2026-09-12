@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 /*
- * Only what Tailwind cannot express in a class: the environment behind the
- * panes, the glass recipes themselves, and the browser chrome for scrollbars,
- * dialogs and autofill.
+ * Only what Tailwind cannot express in a class: the lit room behind the glass,
+ * the glass recipes themselves, and the browser chrome for scrollbars, dialogs
+ * and autofill.
  */
 
 @layer base {
@@ -16,31 +16,31 @@
   }
 
   /*
-   * The environment.
+   * The room.
    *
-   * Glass needs something to refract, so the page is not a flat colour: three
-   * wide pools of light sit behind everything, fixed to the viewport so the
-   * panes appear to move across a lit room rather than dragging their own
-   * background with them.
+   * Glass has nothing to do unless there is something behind it, so the page is
+   * not a flat colour: several wide pools of pale light sit behind everything,
+   * fixed to the viewport so the sheets appear to move across a lit surface
+   * rather than dragging their own background along with them.
    */
   body {
-    @apply bg-env font-sans text-ink antialiased;
+    @apply bg-room font-sans text-ink antialiased;
 
     background-image:
-      radial-gradient(1200px 780px at 6% -12%, rgba(61, 214, 140, 0.30), transparent 60%),
-      radial-gradient(1000px 720px at 98% 2%, rgba(86, 148, 255, 0.26), transparent 62%),
-      radial-gradient(900px 700px at 78% 96%, rgba(150, 96, 255, 0.16), transparent 60%),
-      radial-gradient(1100px 860px at 34% 112%, rgba(61, 214, 140, 0.18), transparent 60%);
+      radial-gradient(1150px 760px at 2% -14%, rgba(15, 169, 104, 0.28), transparent 58%),
+      radial-gradient(980px 700px at 99% -2%, rgba(37, 99, 235, 0.24), transparent 60%),
+      radial-gradient(880px 680px at 84% 100%, rgba(139, 92, 246, 0.22), transparent 58%),
+      radial-gradient(1050px 800px at 22% 110%, rgba(15, 169, 104, 0.18), transparent 58%);
     background-attachment: fixed;
   }
 
   ::selection {
-    background: rgba(61, 214, 140, 0.32);
+    background: rgba(15, 169, 104, 0.22);
   }
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+    scrollbar-color: rgba(15, 23, 42, 0.22) transparent;
   }
 
   *::-webkit-scrollbar {
@@ -53,33 +53,31 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(15, 23, 42, 0.2);
     border-radius: 99px;
     border: 3px solid transparent;
     background-clip: content-box;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.26);
+    background: rgba(15, 23, 42, 0.32);
     background-clip: content-box;
   }
 
-  /* Chrome paints autofilled inputs bright blue, which looks like a fault in a
-     dark interface. The inset shadow trick is the only way to override it. */
   input:-webkit-autofill,
   input:-webkit-autofill:focus {
-    -webkit-text-fill-color: #f2f5f8;
-    -webkit-box-shadow: 0 0 0 1000px rgba(38, 45, 58, 0.98) inset;
+    -webkit-text-fill-color: #0f172a;
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
     transition: background-color 9999s ease-out;
   }
 
   dialog::backdrop {
-    background: rgba(6, 9, 13, 0.6);
-    backdrop-filter: blur(8px);
+    background: rgba(15, 23, 42, 0.28);
+    backdrop-filter: blur(10px) saturate(1.4);
   }
 
-  /* Depth is the whole language here, so somebody who has asked for less
-     movement still gets the hierarchy - they simply stop being flown at. */
+  /* The material is the hierarchy, so somebody who has asked for less movement
+     keeps all of it - they simply stop being flown at. */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -93,42 +91,46 @@
 
 @layer components {
   /*
-   * The three depths everything is built from.
+   * The three thicknesses everything is built from.
    *
-   * `pane`   - the chrome: sidebar, top bar. Full glass, because it sits over
-   *            the environment and is meant to feel like a window frame.
-   * `plate`  - the work surface: holds tables and forms. Barely translucent
-   *            and only lightly blurred, because legibility outranks effect
-   *            wherever the two disagree.
-   * `float`  - dialogs and the command palette, at the top of the stack.
+   * `pane`  - the chrome: sidebar, top bar, bottom bar. Thin glass, fully
+   *           blurred and saturated, so the room's colour comes through it.
+   * `plate` - the work surface that carries tables and forms. Thick and barely
+   *           translucent: legibility outranks material wherever they disagree.
+   * `float` - dialogs and the command palette, at the top of the stack.
+   *
+   * `saturate` is what separates glass from a grey box. Real glass intensifies
+   * the colour it passes; without it a blurred white sheet just looks dirty.
    */
   .pane {
-    @apply rounded-pane border border-rim bg-plate shadow-plate backdrop-blur-pane;
+    @apply rounded-pane border border-white/70 bg-sheet-thin shadow-glass
+           backdrop-blur-pane backdrop-saturate-glass;
   }
 
   .plate {
-    @apply rounded-pane border border-rim-soft bg-plate-raised shadow-plate backdrop-blur-card;
+    @apply rounded-pane border border-white/80 bg-sheet-thick shadow-glass
+           backdrop-blur-card backdrop-saturate-glass;
   }
 
   .float {
-    @apply rounded-pane border border-rim-bright bg-plate-float shadow-float backdrop-blur-pane;
+    @apply rounded-pane border border-white/80 bg-sheet shadow-float
+           backdrop-blur-pane backdrop-saturate-glass;
   }
 
-  /* A card that lifts toward the viewer when pointed at. */
   .card {
-    @apply rounded-card border border-rim-soft bg-plate-raised shadow-plate;
+    @apply rounded-card border border-rim-soft bg-sheet-solid shadow-glass;
   }
 
   .field {
-    @apply w-full rounded-pill border border-rim bg-black/25 px-3.5 py-2.5 text-[13px]
+    @apply w-full rounded-pill border border-rim bg-white/80 px-3.5 py-2.5 text-[13px]
            text-ink outline-none transition
            placeholder:text-ink-faint
-           focus:border-go/45 focus:bg-black/35 focus:ring-2 focus:ring-go/20;
+           focus:border-go/40 focus:bg-white focus:shadow-glow;
   }
 
   .kbd {
     @apply inline-flex h-[19px] min-w-[19px] items-center justify-center rounded-[6px]
-           border border-rim bg-white/[0.07] px-1.5 font-mono text-[10.5px]
+           border border-rim bg-white/90 px-1.5 font-mono text-[10.5px]
            font-semibold leading-none text-ink-muted;
   }
 }

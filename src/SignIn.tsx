@@ -38,7 +38,7 @@ declare global {
 
 function Mark() {
   return (
-    <svg viewBox="0 0 100 100" className="mx-auto mb-5 h-16 w-16 rounded-card border border-rim bg-white/[0.07] p-2">
+    <svg viewBox="0 0 100 100" className="mx-auto mb-5 h-16 w-16 rounded-card border border-rim bg-white/70 p-2">
       <rect width="100" height="100" rx="24" fill="#12A25F" />
       <path
         d="M22 48 L50 26 L78 48"
@@ -135,7 +135,9 @@ function FirstStep({
       googleSlot.current.replaceChildren();
 
       window.google.accounts.id.renderButton(googleSlot.current, {
-        theme: 'filled_black',
+        // Light panel, so Google's light button. `filled_black` was chosen
+        // for the dark schemes and reads as a hole punched in the card here.
+        theme: 'outline',
         size: 'large',
         width: 320,
         text: 'signin_with',
@@ -214,7 +216,7 @@ function FirstStep({
 
       {/* Google draws its own button and will not be restyled, so it is given a
           pressed card to sit in rather than looking pasted on. */}
-      <div ref={googleSlot} className="flex min-h-[44px] justify-center rounded-pill border border-rim bg-white/[0.07] p-1.5" />
+      <div ref={googleSlot} className="flex min-h-[44px] justify-center rounded-pill border border-rim bg-white/70 p-1.5" />
 
       <div className="relative my-5 text-[11.5px] uppercase tracking-wider text-ink-faint">
         <span className="absolute left-0 top-1/2 h-px w-[calc(50%-28px)] bg-rim-soft" />
@@ -326,7 +328,7 @@ function SecondStep({
           setCode(digits);
           if (digits.length === 6) void submit(digits);
         }}
-        className="my-5 w-full rounded-pill border border-rim bg-white/[0.07] p-4 text-center font-mono text-[27px] font-bold tracking-[11px] text-ink outline-none focus:ring-2 focus:ring-go/35"
+        className="my-5 w-full rounded-pill border border-rim bg-white/70 p-4 text-center font-mono text-[27px] font-bold tracking-[11px] text-ink outline-none focus:ring-2 focus:ring-go/35"
       />
 
       <Button busy={busy} onClick={() => void submit(code)}>

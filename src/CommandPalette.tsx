@@ -115,12 +115,12 @@ export function CommandPalette({ commands }: { commands: Command[] }) {
 
   return (
     <div
-      className="animate-fade fixed inset-0 z-50 flex justify-center bg-black/65 px-4 pt-[12vh] backdrop-blur-[2px]"
+      className="animate-fade fixed inset-0 z-50 flex justify-center bg-ink/25 px-4 pt-[12vh] backdrop-blur-[2px]"
       onMouseDown={() => setOpen(false)}
       role="presentation"
     >
       <div
-        className="animate-pop h-fit w-full max-w-[540px] overflow-hidden rounded-card border border-rim-bright bg-plate-float shadow-float"
+        className="animate-pop h-fit w-full max-w-[540px] overflow-hidden rounded-card border border-white/80 bg-sheet shadow-float"
         onMouseDown={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -154,7 +154,7 @@ export function CommandPalette({ commands }: { commands: Command[] }) {
                 onClick={() => choose(command)}
                 className={
                   'flex w-full items-center justify-between gap-4 rounded-pill px-3 py-2.5 text-left text-[13.5px] transition-colors ' +
-                  (i === cursor ? 'bg-white/[0.07] text-ink' : 'text-ink-muted')
+                  (i === cursor ? 'bg-white/70 text-ink' : 'text-ink-muted')
                 }
               >
                 <span className="truncate">{command.label}</span>
